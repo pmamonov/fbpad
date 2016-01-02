@@ -14,7 +14,7 @@
 typedef unsigned int fbval_t;
 
 /* tinyfont files for regular, italic, and bold fonts */
-#define FR		"/path/to/font.tf"
+#define FR		"/mnt/ext1/system/mono.tf"
 #define FI		NULL
 #define FB		NULL
 
