@@ -11,7 +11,8 @@
 #define MAIL		{"mailx", "-f", "+inbox"}
 
 /* fbval_t should match framebuffer depth */
-typedef unsigned int fbval_t;
+#include <stdint.h>
+typedef uint8_t fbval_t;
 
 /* tinyfont files for regular, italic, and bold fonts */
 #define FR		"/mnt/ext1/system/mono.tf"

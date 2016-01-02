@@ -255,6 +255,7 @@ static int pollterms(void)
 		peepterm(term_idx[i]);
 		if (ufds[i].revents & POLLIN) {
 			term_read();
+			SoftUpdate();
 		} else {
 			scr_free(term_idx[i]);
 			term_end();

@@ -1,9 +1,7 @@
+#include <inkview.h>
 /* fbpad's framebuffer interface */
-
 /* fb_mode() interpretation */
-#define FBM_BPP(m)	(((m) >> 16) & 0x0f)	/* bytes per pixel (4 bits) */
-#define FBM_CLR(m)	((m) & 0x0fff)		/* bits per color (12 bits) */
-#define FBM_ORD(m)	(((m) >> 20) & 0x07)	/* color order (3 bits) */
+#define FBM_BPP(m)	1	/* bytes per pixel (4 bits) */
 
 /* main functions */
 int fb_init(char *dev);
