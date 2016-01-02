@@ -8,42 +8,58 @@
 #include <pthread.h>
 #include <inkview.h>
 #include "draw.h"
+#include "kbd.h"
 
 #undef DEBUG
 #include "debug.h"
+
+#define KBD_HEIGHT 200
 
 #define MIN(a, b)	((a) < (b) ? (a) : (b))
 #define MAX(a, b)	((a) > (b) ? (a) : (b))
 #define NLEVELS		(1 << 8)
 
 static icanvas *screen;
-static int ori;
-pthread_t t;
+static pthread_t t;
 
 static int inkview_handler(int type, int par1, int par2)
 {
-
 	switch (type) {	
 	case EVT_SHOW:
+		kbd_draw();
 		FullUpdate();
 		break;
 	case EVT_POINTERDOWN:
-		dmsg("POINTERDOWN %d %d", par1, par2);
+		kbd_push(par1, par2);
+		kbd_draw();
+		SoftUpdate();
 		break;
 	case EVT_KEYPRESS:
-		SetOrientation(ori);
-		CloseApp();
+		dmsg("keypress 0x%x", par1);
+		switch (par1) {
+		case KEY_MENU:
+			kfifo_putchar(&kfifo, '\r');
+			break;
+		case KEY_PREV:
+			kfifo_puts(&kfifo, "\x1b[A");
+			break;
+		case KEY_NEXT:
+			kfifo_puts(&kfifo, "\x1b[B");
+			break;
+		default:
+			break;
+		}
 		break;
 	case EVT_ORIENTATION:
 		break;
 	}
 	return 0;
-
 }
 
-void *tfunc(void)
+void *tfunc(void *arg)
 {
 	InkViewMain(inkview_handler);
+	return NULL;
 }
 
 void fb_cmap(void)
@@ -59,14 +75,8 @@ unsigned fb_mode(void)
 int fb_init(char *dev)
 {
 	OpenScreen();
-	dmsg("hello");
-	ori = GetOrientation();
-	/* SetOrientation(ROTATE90); */
 	screen = GetCanvas();
-	dmsg("canvas: w=%d h=%d d=%d",
-	     screen->width,
-	     screen->height,
-	     screen->depth);
+	kbd_init(0, screen->height - KBD_HEIGHT, screen->width, screen->height);
 	pthread_create(&t, NULL, tfunc, NULL);
 	return 0;
 }
@@ -78,7 +88,7 @@ void fb_free(void)
 
 int fb_rows(void)
 {
-	return screen->height;
+	return screen->height - KBD_HEIGHT;
 }
 
 int fb_cols(void)

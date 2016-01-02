@@ -20,6 +20,7 @@
 #include "config.h"
 #include "fbpad.h"
 #include "draw.h"
+#include "kbd.h"
 
 #define CTRLKEY(x)	((x) - 96)
 #define POLLFLAGS	(POLLIN | POLLHUP | POLLERR | POLLNVAL)
@@ -44,8 +45,8 @@ static int cmdmode;		/* execute a command and exit */
 static int readchar(void)
 {
 	char b;
-	if (read(0, &b, 1) > 0)
-		return (unsigned char) b;
+	if (kfifo_poll(&kfifo))
+		return (unsigned char)kfifo_getchar(&kfifo);
 	return -1;
 }
 
@@ -234,6 +235,7 @@ static int pollterms(void)
 	int term_idx[NTERMS + 1];
 	int i;
 	int n = 1;
+
 	ufds[0].fd = 0;
 	ufds[0].events = POLLIN;
 	for (i = 0; i < NTERMS; i++) {
@@ -243,12 +245,12 @@ static int pollterms(void)
 			term_idx[n++] = i;
 		}
 	}
-	if (poll(ufds, n, 1000) < 1)
+	while (kfifo_poll(&kfifo))
+		directkey();
+	if (poll(ufds, n, 100) < 1)
 		return 0;
 	if (ufds[0].revents & (POLLFLAGS & ~POLLIN))
 		return 1;
-	if (ufds[0].revents & POLLIN)
-		directkey();
 	for (i = 1; i < n; i++) {
 		if (!(ufds[i].revents & POLLFLAGS))
 			continue;

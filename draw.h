@@ -1,4 +1,5 @@
 #include <inkview.h>
+#include "kfifo.h"
 /* fbpad's framebuffer interface */
 /* fb_mode() interpretation */
 #define FBM_BPP(m)	1	/* bytes per pixel (4 bits) */
