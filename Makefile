@@ -1,6 +1,6 @@
-CC = cc
+CC = arm-none-linux-gnueabi-gcc
 CFLAGS = -Wall -O2
-LDFLAGS =
+LDFLAGS = -linkview
 
 all: fbpad
 %.o: %.c config.h
