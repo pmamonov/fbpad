@@ -21,6 +21,40 @@
 
 static icanvas *screen;
 static pthread_t t;
+static int ul, ur, ut, ub;
+
+void fb_update_start()
+{
+	ul = screen->width;
+	ur = 0;
+	ut = screen->height;
+	ub = 0;
+}
+
+void fb_update(int row, int col, int len)
+{
+	int t = row;
+	int b = t + (col + len) / screen->width;
+	int l = col + len < screen->width ? col : 0;
+	int r = col + len < screen->width ? col + len : screen->width;
+
+	if (l < ul)
+		ul = l;
+	if (r > ur)
+		ur = r;
+	if (t < ut)
+		ut = t;
+	if (b > ub)
+		ub = b;
+}
+
+void fb_update_finish()
+{
+	if (ul >= ur ||
+	    ut >= ub)
+	    return;
+	PartialUpdateBW(ul, ut, ur - ul, ub - ut);
+}
 
 static int inkview_handler(int type, int par1, int par2)
 {

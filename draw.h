@@ -13,3 +13,6 @@ int fb_rows(void);
 int fb_cols(void);
 void fb_cmap(void);
 unsigned fb_val(int r, int g, int b);
+void fb_update_start();
+void fb_update_finish();
+void fb_update(int row, int col, int len);

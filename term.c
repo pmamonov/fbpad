@@ -228,6 +228,7 @@ static void term_blank(void)
 static void ctlseq(void);
 void term_read(void)
 {
+	fb_update_start();
 	ctlseq();
 	while (ptycur < ptylen) {
 		if (visible && !lazy && ptylen - ptycur > 15)
@@ -235,6 +236,7 @@ void term_read(void)
 		ctlseq();
 	}
 	lazy_flush();
+	fb_update_finish();
 }
 
 static void term_reset(void)
